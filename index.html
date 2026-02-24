@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+    <link href="style.css" rel="stylesheet">
+    <meta charset="utf-8">
+
+	<title>AudioIM</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    
+</head>
+
+<body data-new-gr-c-s-check-loaded="14.1091.0" data-gr-ext-installed="">
+
+<style>
+        table {
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 8px;
+        }
+      
+        td:nth-child(2), th:nth-child(2) {
+          position: relative;
+        }
+      
+        td:nth-child(2)::after, th:nth-child(2)::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 1px;           /* 线的宽度 */
+          height: 100%;
+          background-color: rgb(219, 207, 207);
+          transform: translateX(5px); /* 相当于“右边padding” */
+        }
+      </style>
+<div class="container" >
+<header role="banner">
+</header>
+<main role="main">
+<article itemscope itemtype="https://schema.org/BlogPosting">
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+    <div class="column has-text-centered">
+    <!-- <h1 class="title is-1 publication-title"> <b>AudioIM:</b>  </h1> -->
+    <h3 class="title is-2 publication-title"> <b>Audio Imitator: Controlling Timbre and Prosody in Video2Audio Synthesis with Audio Reference</b></h3>
+    </div>
+    <br>
+    <!-- authors -->
+    <!-- <div class="is-size-5">
+        <span class="author-block">
+          <h4 style="text-align: center;"><b>Authors: </h4>
+    </div> -->
+    <!-- unit -->
+    <!-- <div class="is-size-5 publication-authors"> -->
+        <!-- <span class="author-block"><h4 style="text-align: center;"><b style="color:#d76100; font-weight:normal">&#x25B6 </b></h4></span> -->
+    <!-- </div> -->
+
+
+    <div class="column has-text-centered">
+
+        <!-- <span class="link-block">
+            <a href="?????" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span class="icon">
+                <i class="ai ai-arxiv"></i>
+            </span>
+            <span>Paper</span>
+            </a>
+        </span> -->
+        
+        <span class="link-block">
+            <a href="https://anonymousdemo757.github.io" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span class="icon">
+                <i class="fab fa-github"></i>
+            </span>
+            <span>Github will be released soon</span>
+            </a>
+        </span>
+    </div>
+
+
+
+
+</div>
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+    <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Overview</h2>
+        </div>
+    </div>
+    <p style="font-size: 18px;">
+        Video-to-audio (V2A) generation has recently attracted increasing attention, particularly in achieving semantic consistency and temporal alignment. Existing works have demonstrated promising progress in this direction, but they generally condition only on visual/text content and provide little control over timbre and prosody. Timbre refers to voiceprint-like characteristics, while prosody refers to the rhythm and temporal dynamics.
+We introduce AudioIM, a promptable video-to-audio generator built on the MMAudio backbone with two key extensions: (i) a temporal-masking strategy during training that enables the model to leverage an audio prompt, and (ii) dual style encoders that inject prompt-derived features into both global and frame-level conditioning, thereby allowing fine-grained control of timbre and prosody.
+AudioIM produces audio with higher style similarity to the prompt and achieves strong performance on core video-to-audio tasks, while preserving semantic and temporal alignment. 
+    </p>
+    <br>
+    <br>
+    <div class="text-center">
+        <!-- 第一张图片单独一行 -->
+        <img id="teaser" width="70%" src="imgs/overview.png">     
+        <br><br>
+        <p style="font-style: italic; margin-top: 8px;">
+            <b>Figure 1.</b> 
+            Overview of AudioIM. The training mask and the style encoder of the proposed method. Through mask training, the model is enabled to leverage prompt audio latents to provide fine-grained stylistic information for audio generation. We separately extract timbre and prosody features from the prompt audio by two encoders, and subsequently fuse them and inject fused feature into the model through conditioning.
+        </p>
+
+    </div>
+    
+    <br><br>
+    
+</div>
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+    <h3>Style Similarity between Generated and Prompt Audios</h3>
+    <h6>Current video-to-audio works generally condition only on visual/text content and provide little control over timbre and prosody. AudioIM produces audio with higher style similarity to the prompt and achieves strong performance on core video-to-audio tasks.</h6>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover pt-2 text-center" style="width: 100%; table-layout: fixed;">
+            <thead>
+                <tr>
+                    <th class="align-middle">Prompt</th>
+                    <th class="align-middle">Ground Truth</th>
+                    <th class="align-middle">MMAudio(Vanilla)</th>
+                    <th class="align-middle">MMAudio w/ Prompt Masking</th>
+                    <th class="align-middle">AudioIM w/o Style Enc</th>
+                    <th class="align-middle">AudioIM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 第一组样本 -->
+                <tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/bu-zB_kmBao_000043.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/bu-zB_kmBao_000043.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/bu-zB_kmBao_000043.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/bu-zB_kmBao_000043.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/bu-zB_kmBao_000043.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/bu-zB_kmBao_000043.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+				
+                <tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/0izHOfrwPn4_000180.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/0izHOfrwPn4_000180.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/0izHOfrwPn4_000180.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/0izHOfrwPn4_000180.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/0izHOfrwPn4_000180.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/0izHOfrwPn4_000180.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+				
+                <tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/pGnTEZvUcuo_000163.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/pGnTEZvUcuo_000163.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/pGnTEZvUcuo_000163.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/pGnTEZvUcuo_000163.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/pGnTEZvUcuo_000163.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/pGnTEZvUcuo_000163.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/GtPLlcyLykQ_000030.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/GtPLlcyLykQ_000030.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/GtPLlcyLykQ_000030.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/GtPLlcyLykQ_000030.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/GtPLlcyLykQ_000030.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/GtPLlcyLykQ_000030.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+
+				<tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/17yDXvJTdeo_000603.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/17yDXvJTdeo_000603.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/17yDXvJTdeo_000603.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/17yDXvJTdeo_000603.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/17yDXvJTdeo_000603.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/17yDXvJTdeo_000603.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+
+				<tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/LC4vDpnkDtM_000063.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/LC4vDpnkDtM_000063.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/LC4vDpnkDtM_000063.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/LC4vDpnkDtM_000063.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/LC4vDpnkDtM_000063.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/LC4vDpnkDtM_000063.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+
+				<tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/mYZyXIYEJAQ_000095.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/mYZyXIYEJAQ_000095.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/mYZyXIYEJAQ_000095.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/mYZyXIYEJAQ_000095.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/mYZyXIYEJAQ_000095.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/mYZyXIYEJAQ_000095.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+
+				<tr>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/ref/vXBBhgvMCkM_000210.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/gt/vXBBhgvMCkM_000210.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+						<video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio(Vanilla)/vXBBhgvMCkM_000210.mp4" type="video/mp4">
+                        </video>
+					</td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/MMAudio_PM/vXBBhgvMCkM_000210.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">                        
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM_wo_StyleEnc/vXBBhgvMCkM_000210.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        <video controls style="width:80%; max-width:200px;">
+                            <source src="video/AudioIM/vXBBhgvMCkM_000210.mp4" type="video/mp4">
+                        </video>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+</div>
